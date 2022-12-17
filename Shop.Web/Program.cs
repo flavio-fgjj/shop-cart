@@ -1,13 +1,18 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Shop.Web.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var baseUrl = "https://localhost:7264";
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri(baseUrl)
+});
+
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();
 

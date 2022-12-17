@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Shop.Models\Shop.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+
 </Project>
