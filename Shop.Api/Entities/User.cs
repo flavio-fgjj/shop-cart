@@ -1,9 +1,12 @@
-﻿namespace Shop.Api.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Shop.Api.Entities;
 
 public class User
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    [MaxLength(60)]
+    public string UserName { get; set; } = string.Empty;
 
     public Cart? Cart { get; set; } // explicit relationship (one to one)
 }

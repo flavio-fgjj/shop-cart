@@ -1,17 +1,19 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shop.Api.Entities;
 
 public class Product
 {
-    public int ProductId { get; set; }
-
+    public int Id { get; set; }
+    [MaxLength(100)]
     public string? Name { get; set; } = string.Empty;
-
+    [MaxLength(200)]
     public string? Description { get; set; } = string.Empty;
-
+    [Column(TypeName = "decimal(10,2)")]
     public decimal? Price { get; set; }
-
+    [MaxLength(250)]
     public string? ImageUrl { get; set; } = string.Empty;
 
     public int? Total { get; set; }
