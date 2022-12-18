@@ -1,0 +1,60 @@
+﻿@page "/product-detail/{Id:int}"
+
+@if (Product is null && ErrorMessage is null)
+{
+    <ShowSpinner />
+}
+else if (ErrorMessage is not null)
+{
+    <ShowError ErrorMessage="@ErrorMessage"></ShowError>
+}
+else
+{
+    <h3 class="mb-5">Product Details</h3>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <figure class="figure">
+                <img class="figure-img img-fluid rounded" src="@Product.ImageUrl">
+                <figcaption class="figure-caption">@Product.Description</figcaption>
+            </figure>
+        </div>
+        <div class="col-md-6">
+            <h3>@Product.Name</h3>
+            <p class="mb-4">
+                <b>
+                    @Product.Price?.ToString("C")&nbsp;(@Product.Total in stock)
+                </b>
+            </p>
+            <div>
+                <button class="btn btn-success">
+                    Add to cart <span class="oi oi-basket"></span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+}
+
+@code {
+    [Inject]
+    public IProductService? ProductService { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    public ProductDto? Product { get; set; }
+
+    public string? ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Product = await ProductService.GetItem(Id);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+}
