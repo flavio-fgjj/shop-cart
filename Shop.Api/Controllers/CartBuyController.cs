@@ -33,15 +33,11 @@ public class CartBuyController : ControllerBase
         {
             var cartItems = await cartBuyRepository.GetItems(userId);
             if (cartItems == null)
-            {
                 return NoContent(); // 204 Status Code
-            }
 
             var products = await this.productRepository.GetItems();
             if (products == null)
-            {
                 throw new Exception("Products not found");
-            }
 
             var cartItemsDto = cartItems.MapCartItensToDto(products);
             return Ok(cartItemsDto);
@@ -60,16 +56,13 @@ public class CartBuyController : ControllerBase
         {
             var cartItem = await cartBuyRepository.GetItem(id);
             if (cartItem == null)
-            {
                 return NotFound($"Item not found"); //404 status code
-            }
 
             var product = await productRepository.GetItem(cartItem.ProductId);
 
             if (product == null)
-            {
                 return NotFound($"Item don't exists");
-            }
+
             var cartItemDto = cartItem.MapCartItemToDto(product);
 
             return Ok(cartItemDto);
@@ -89,16 +82,12 @@ public class CartBuyController : ControllerBase
             var newCartItem = await cartBuyRepository.AddItem(cartItemAddDto);
 
             if (newCartItem == null)
-            {
                 return NoContent(); //Status 204
-            }
 
             var product = await productRepository.GetItem(newCartItem.ProductId);
 
             if (product == null)
-            {
                 throw new Exception($"Product not found (Id:({cartItemAddDto.ProductId})");
-            }
 
             var newCartItemmDto = newCartItem.MapCartItemToDto(product);
 
@@ -121,9 +110,7 @@ public class CartBuyController : ControllerBase
             var cartItem = await cartBuyRepository.RemoveItem(id);
 
             if (cartItem == null)
-            {
                 return NotFound();
-            }
 
             var product = await productRepository.GetItem(cartItem.ProductId);
 
@@ -140,9 +127,8 @@ public class CartBuyController : ControllerBase
         }
     }
 
-    [HttpPatch("{id:int}")]
-    public async Task<ActionResult<CartItemDto>> UpdateTotal(int id,
-        CartItemUpdateTotalDto cartItemUpdateTotalDto)
+    [HttpPatch("{id:int}")] // partial update
+    public async Task<ActionResult<CartItemDto>> UpdateTotal(int id, CartItemUpdateTotalDto cartItemUpdateTotalDto)
     {
         try
         {
@@ -150,9 +136,8 @@ public class CartBuyController : ControllerBase
             var cartItem = await cartBuyRepository.UpdateTotal(id, cartItemUpdateTotalDto);
 
             if (cartItem == null)
-            {
                 return NotFound();
-            }
+
             var product = await productRepository.GetItem(cartItem.ProductId);
             var cartItemDto = cartItem.MapCartItemToDto(product);
             return Ok(cartItemDto);

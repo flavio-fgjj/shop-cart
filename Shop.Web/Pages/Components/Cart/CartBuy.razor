@@ -1,4 +1,5 @@
 ﻿@page "/CartBuy"
+@inject IJSRuntime Js;
 
 @if (CartBuyItems is null && ErrorMessage is null)
 {
@@ -27,8 +28,16 @@ else
                                 @item.ProductDescription
                             </div>
                             <span>Preço: <b>@item.Price?.ToString("C")</b>
-
-                            <button class="btn btn-danger sm" @onclick="(() => RemoveCartItem_Click(item.Id))">
+                            <input type="number" @bind="@item.Total">
+                            <button 
+                                data-itemId="@item.Id" 
+                                class="btn btn-success btn-sm updateTotal" 
+                                @onclick="(() => UpdateTotalCartItem_Click(item.Id, item.Total))"
+                                @oninput="() => UpdateTotalCartItem_Input(item.Id)">
+                                <span class="oi oi-check"></span>
+                            </button>
+                            <br />
+                            <button class="btn btn-danger btn-sm" @onclick="(() => RemoveCartItem_Click(item.Id))">
                                 <span class="oi oi-trash"></span>
                              </button>
                             </span>
@@ -39,7 +48,7 @@ else
             <div class="col-md-3">
                 <h5>Cart - Summary</h5>
                 <div class="mt-2">
-                    <div>Total - </div>
+                    <div>Total - (@Total items)&nbsp;<br /><b>@FinalPrice</b></div>
                     <a href="#" class="btn btn-success">
                         <span class="oi oi-credit-card"></span>&nbsp; Close Order
                     </a>
@@ -64,15 +73,51 @@ else
 
     public string? ErrorMessage { get; set; }
 
+    protected string? FinalPrice { get; set; }
+    protected int Total { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
             CartBuyItems = await CartBuyService.GetItems(LoggedUser.UserId);
+            CalculateSummary();
         }
         catch (Exception ex)
         {
             ErrorMessage = ex.Message;
+        }
+    }
+
+    protected async Task UpdateTotalCartItem_Click(int id, int total)
+    {
+        try
+        {
+            switch (total)
+            {
+                case > 0:
+                    var updateItemDto = new CartItemUpdateTotalDto
+                        {
+                            CartItemid = id,
+                            CartTotal = total
+                        };
+                    var returnUpdateItemDto = await CartBuyService.UpdateItem(updateItemDto);
+                    UpdateFinalPriceItem(returnUpdateItemDto);
+                    CalculateSummary();
+                    break;
+                default:
+                    var item = CartBuyItems.FirstOrDefault(i => i.Id == id);
+                    if (item is not null)
+                    {
+                        item.Total = 1;
+                        item.FinalPrice = item.Price;
+                    }
+                    break;
+            }
+        }   
+        catch (Exception)
+        {
+            throw;
         }
     }
 
@@ -82,6 +127,7 @@ else
 
         // remove thisitem from collection (in memory | client side)
         RemoveCartItem(id);
+        CalculateSummary();
     }
 
     private CartItemDto GetCartItem(int id)
@@ -93,4 +139,34 @@ else
     {
         CartBuyItems.Remove(GetCartItem(id));
     }
+
+    #region Total Cart and Final Price
+    private void SetFinalPrice()
+    {
+        FinalPrice = CartBuyItems.Sum(p => p.FinalPrice)?.ToString("C");
+    }
+
+    private void SetTotal()
+    {
+        Total = CartBuyItems.Sum(p => p.Total);
+    }
+
+    private void CalculateSummary()
+    {
+        SetFinalPrice();
+        SetTotal();
+    }
+
+    private void UpdateFinalPriceItem(CartItemDto cartItemDto)
+    {
+        var item = GetCartItem(cartItemDto.Id);
+        if (item != null)
+            item.FinalPrice = cartItemDto.Price * cartItemDto.Total;
+    }
+
+    protected async Task UpdateTotalCartItem_Input(int id)
+    {
+        await Js.InvokeVoidAsync("SetBtnUpdateTotalVisible", id, true);
+    }
+    #endregion
 }

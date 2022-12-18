@@ -88,9 +88,16 @@ namespace Shop.Api.Repositories
             return item ?? new CartItem();
         }
 
-        public Task<CartItem> UpdateTotal(int id, CartItemUpdateTotalDto cartItemUpdateTotalDto)
+        public async Task<CartItem> UpdateTotal(int id, CartItemUpdateTotalDto cartItemUpdateTotalDto)
         {
-            throw new NotImplementedException();
+            var cartItem = await _context.CartItems.FindAsync(id);
+            if (cartItem is not null)
+            {
+                cartItem.Total = cartItemUpdateTotalDto.CartTotal;
+                await _context.SaveChangesAsync();
+                return cartItem;
+            }
+            return new CartItem();
         }
     }
 }

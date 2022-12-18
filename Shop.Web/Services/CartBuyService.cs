@@ -1,6 +1,8 @@
 ﻿using Shop.Models.DTOs;
 using System.Net;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 
 namespace Shop.Web.Services;
 
@@ -84,5 +86,27 @@ public class CartBuyService : ICartBuyService
         {
             throw;
         }
+    }
+
+    public async Task<CartItemDto> UpdateItem(CartItemUpdateTotalDto cartItemUpdateTotalDto)
+    {
+        try
+        {
+            var jsonRequest = JsonSerializer.Serialize(cartItemUpdateTotalDto);
+
+            var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json-patch+json");
+
+            var response = await _httpClient.PatchAsync($"api/CartBuy/{cartItemUpdateTotalDto.CartItemid}", content);
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<CartItemDto>();
+            
+            return new CartItemDto();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+
     }
 }
