@@ -16,12 +16,12 @@ public class CartBuyController : ControllerBase
     private ILogger<CartBuyController> logger;
 
     public CartBuyController(
-        ICartBuyRepository cartBuyRepository,
-        IProductRepository productRepository,
+        ICartBuyRepository iCartBuyRepository,
+        IProductRepository iProductRepository,
         ILogger<CartBuyController> logger)
     {
-        cartBuyRepository = cartBuyRepository;
-        productRepository = productRepository;
+        cartBuyRepository = iCartBuyRepository;
+        productRepository = iProductRepository;
         this.logger = logger;
     }
 
@@ -82,8 +82,7 @@ public class CartBuyController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<CartItemDto>> PostItem([FromBody]
-    CartItemAddNewItemDto cartItemAddDto)
+    public async Task<ActionResult<CartItemDto>> PostItem([FromBody] CartItemAddNewItemDto cartItemAddDto)
     {
         try
         {

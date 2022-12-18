@@ -26,7 +26,12 @@ else
                 </b>
             </p>
             <div>
-                <button class="btn btn-success">
+                <button class="btn btn-success" 
+                 @onclick="() => AddToCart_Click(new CartItemAddNewItemDto{
+                         CartId = LoggedUser.CartId,
+                         ProductId = Product.Id,
+                         Total = 1
+                  })">
                     Add to cart <span class="oi oi-basket"></span>
                 </button>
             </div>
@@ -38,6 +43,15 @@ else
 @code {
     [Inject]
     public IProductService? ProductService { get; set; }
+
+    [Inject]
+    public ICartBuyService? CartBuyService { get; set; }
+
+
+    [Inject]
+    public NavigationManager? NavigationManager { get; set; }
+
+    private List<CartItemDto>? CartBuyItems { get; set; }
 
     [Parameter]
     public int Id { get; set; }
@@ -55,6 +69,27 @@ else
         catch (Exception ex)
         {
             ErrorMessage = ex.Message;
+        }
+    }
+
+    protected async Task AddToCart_Click(CartItemAddNewItemDto cartItemAddNewItemDto)
+    {
+        try
+        {
+            var cartItemDto = await CartBuyService.AddItem(cartItemAddNewItemDto);
+
+            //if (cartItemDto != null)
+            //{
+            //    CartBuyItems.Add(cartItemDto);
+            //    await GerenciaCarrinhoItensLocalStorageService.SaveCollection(CarrinhoCompraItens);
+            //}
+
+            NavigationManager.NavigateTo("/CartBuy");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            throw;
         }
     }
 }

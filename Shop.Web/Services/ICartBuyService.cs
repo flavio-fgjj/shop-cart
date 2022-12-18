@@ -4,6 +4,7 @@ namespace Shop.Web.Services;
 
 public interface ICartBuyService
 {
-    Task<List<CartItemDto>> GetItens(string userId);
+    Task<List<CartItemDto>> GetItems(string userId);
     Task<CartItemDto> AddItem(CartItemAddNewItemDto cartItemAddNewItemDto);
+    Task<CartItemDto> RemoveItem(int id);
 }

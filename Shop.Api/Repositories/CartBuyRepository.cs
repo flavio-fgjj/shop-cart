@@ -22,8 +22,7 @@ namespace Shop.Api.Repositories
 
         public async Task<CartItem> AddItem(CartItemAddNewItemDto cartItemAddNewItemDto)
         {
-            if (await ItemCartExists(cartItemAddNewItemDto.CartId,
-            cartItemAddNewItemDto.ProductId) == false)
+            if (await ItemCartExists(cartItemAddNewItemDto.CartId, cartItemAddNewItemDto.ProductId) == false)
             {
                 //check if the products exists
                 //add new item to cart
@@ -78,9 +77,15 @@ namespace Shop.Api.Repositories
                           }).ToListAsync();
         }
 
-        public Task<CartItem> RemoveItem(int id)
+        public async Task<CartItem> RemoveItem(int id)
         {
-            throw new NotImplementedException();
+            var item = await _context.CartItems.FindAsync(id);
+            if (item is not null)
+            {
+                _context.CartItems.Remove(item);
+                await _context.SaveChangesAsync();
+            }
+            return item ?? new CartItem();
         }
 
         public Task<CartItem> UpdateTotal(int id, CartItemUpdateTotalDto cartItemUpdateTotalDto)

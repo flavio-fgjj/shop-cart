@@ -1,0 +1,96 @@
+﻿@page "/CartBuy"
+
+@if (CartBuyItems is null && ErrorMessage is null)
+{
+    <ShowSpinner />
+}
+else if (ErrorMessage is not null)
+{
+    <ShowError ErrorMessage="@ErrorMessage"></ShowError>
+}
+else
+{
+    <h3 class="mb-5">Cart</h3>
+    @if (CartBuyItems.Count() > 0)
+    {
+        <div class="row mb-5">
+            <div class="col-md-9">
+                @foreach (var item in CartBuyItems)
+                {
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <img src="@item.ProductImageUrl" width="250" class="img-thumbnail">
+                        </div>
+                        <div class="col-md-9">
+                            <h5>@item.ProductName</h5>
+                            <div class="mb-4">
+                                @item.ProductDescription
+                            </div>
+                            <span>Preço: <b>@item.Price?.ToString("C")</b>
+
+                            <button class="btn btn-danger sm" @onclick="(() => RemoveCartItem_Click(item.Id))">
+                                <span class="oi oi-trash"></span>
+                             </button>
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-md-3">
+                <h5>Cart - Summary</h5>
+                <div class="mt-2">
+                    <div>Total - </div>
+                    <a href="#" class="btn btn-success">
+                        <span class="oi oi-credit-card"></span>&nbsp; Close Order
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div>
+            <h3><b>Your cart is empty</b></h3>
+       </div>
+    }
+}
+@code {
+
+    [Inject]
+    public ICartBuyService? CartBuyService { get; set; }
+
+    private List<CartItemDto>? CartBuyItems { get; set; }
+
+
+    public string? ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            CartBuyItems = await CartBuyService.GetItems(LoggedUser.UserId);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+
+    protected async Task RemoveCartItem_Click(int id)
+    {
+        var cartItemDto = await CartBuyService.RemoveItem(id);
+
+        // remove thisitem from collection (in memory | client side)
+        RemoveCartItem(id);
+    }
+
+    private CartItemDto GetCartItem(int id)
+    {
+        return CartBuyItems.FirstOrDefault(x => x.Id == id);
+    }
+
+    private async Task RemoveCartItem(int id)
+    {
+        CartBuyItems.Remove(GetCartItem(id));
+    }
+}

@@ -42,7 +42,7 @@ public class CartBuyService : ICartBuyService
         }
     }
 
-    public async Task<List<CartItemDto>> GetItens(string userId)
+    public async Task<List<CartItemDto>> GetItems(string userId)
     {
         try
         {
@@ -62,6 +62,23 @@ public class CartBuyService : ICartBuyService
                 var message = await response.Content.ReadAsStringAsync();
                 throw new Exception($"Http Status Code: {response.StatusCode} Message: {message}");
             }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public async Task<CartItemDto> RemoveItem(int id)
+    {
+        try
+        {
+            var response = await _httpClient.DeleteAsync($"api/CartBuy/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<CartItemDto>();
+            }
+            return default(CartItemDto);
         }
         catch (Exception)
         {

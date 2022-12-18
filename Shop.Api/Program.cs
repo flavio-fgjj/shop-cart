@@ -25,6 +25,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // registering the services on the container DI
 builder.Services.AddScoped<IProductRepository, ProductRepository>(); // It gives an instance for each reference for IProductRepository
+builder.Services.AddScoped<ICartBuyRepository, CartBuyRepository>(); // It gives an instance for each reference for IProductRepository
 
 var app = builder.Build();
 
