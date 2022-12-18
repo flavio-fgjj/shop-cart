@@ -31,8 +31,17 @@ else
 @code {
 	public IEnumerable<ProductDto>? Products { get; set; }
 
+	[Inject]
+	public ICartBuyService? CartBuyService { get; set; }
+
 	protected override async Task OnInitializedAsync()
 	{
 		Products = await productService.GetItems();
+
+		// send notifications for all subscribers from CartBuyChanged event
+		var cartBuyItems = await CartBuyService.GetItems(LoggedUser.UserId);
+		CartBuyService.RaiseEventOnCartBuyChanged(cartBuyItems.Sum(x => x.Total));
 	}
+
+
 }

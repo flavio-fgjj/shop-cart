@@ -25,12 +25,9 @@ public class CartBuyService : ICartBuyService
 
             if (response.IsSuccessStatusCode)// status code between 200 a 299
             {
-                if (response.StatusCode == HttpStatusCode.NoContent)
-                {
-                    // return empty or default value
-                    return default(CartItemDto);
-                }
-                return await response.Content.ReadFromJsonAsync<CartItemDto>();
+                return response.StatusCode == HttpStatusCode.NoContent 
+                    ? default(CartItemDto) // return empty or default value
+                    : await response.Content.ReadFromJsonAsync<CartItemDto>();
             }
             else
             {
@@ -53,11 +50,9 @@ public class CartBuyService : ICartBuyService
 
             if (response.IsSuccessStatusCode)
             {
-                if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                {
-                    return Enumerable.Empty<CartItemDto>().ToList();
-                }
-                return await response.Content.ReadFromJsonAsync<List<CartItemDto>>();
+                return response.StatusCode == System.Net.HttpStatusCode.NoContent
+                    ? Enumerable.Empty<CartItemDto>().ToList()
+                    : await response.Content.ReadFromJsonAsync<List<CartItemDto>>();
             }
             else
             {
@@ -71,16 +66,22 @@ public class CartBuyService : ICartBuyService
         }
     }
 
+    public void RaiseEventOnCartBuyChanged(int total)
+    {
+        if (OnCartBuyChanged != null)
+            OnCartBuyChanged.Invoke(total);
+    }
+
     public async Task<CartItemDto> RemoveItem(int id)
     {
         try
         {
             var response = await _httpClient.DeleteAsync($"api/CartBuy/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadFromJsonAsync<CartItemDto>();
-            }
-            return default(CartItemDto);
+
+            return response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<CartItemDto>()
+                : default(CartItemDto);
+
         }
         catch (Exception)
         {
@@ -98,10 +99,10 @@ public class CartBuyService : ICartBuyService
 
             var response = await _httpClient.PatchAsync($"api/CartBuy/{cartItemUpdateTotalDto.CartItemid}", content);
 
-            if (response.IsSuccessStatusCode)
-                return await response.Content.ReadFromJsonAsync<CartItemDto>();
-            
-            return new CartItemDto();
+            return response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<CartItemDto>()
+                : new CartItemDto();
+
         }
         catch (Exception)
         {

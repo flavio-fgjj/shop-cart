@@ -8,5 +8,8 @@ public interface ICartBuyService
     Task<CartItemDto> AddItem(CartItemAddNewItemDto cartItemAddNewItemDto);
     Task<CartItemDto> UpdateItem(CartItemUpdateTotalDto cartItemUpdateTotalDto);
     Task<CartItemDto> RemoveItem(int id);
-    
+
+    // event to sinalize an ocurrency (in this case, the update total cart item)
+    event Action<int> OnCartBuyChanged;
+    void RaiseEventOnCartBuyChanged(int total);
 }

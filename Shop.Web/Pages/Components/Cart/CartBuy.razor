@@ -28,12 +28,11 @@ else
                                 @item.ProductDescription
                             </div>
                             <span>Preço: <b>@item.Price?.ToString("C")</b>
-                            <input type="number" @bind="@item.Total">
+                            <input type="number" @bind="@item.Total" @oninput="() => UpdateTotalCartItem_Input(item.Id)">
                             <button 
                                 data-itemId="@item.Id" 
                                 class="btn btn-success btn-sm updateTotal" 
-                                @onclick="(() => UpdateTotalCartItem_Click(item.Id, item.Total))"
-                                @oninput="() => UpdateTotalCartItem_Input(item.Id)">
+                                @onclick="(() => UpdateTotalCartItem_Click(item.Id, item.Total))">
                                 <span class="oi oi-check"></span>
                             </button>
                             <br />
@@ -81,7 +80,8 @@ else
         try
         {
             CartBuyItems = await CartBuyService.GetItems(LoggedUser.UserId);
-            CalculateSummary();
+            //CalculateSummary();
+            CartChanged();
         }
         catch (Exception ex)
         {
@@ -103,7 +103,9 @@ else
                         };
                     var returnUpdateItemDto = await CartBuyService.UpdateItem(updateItemDto);
                     UpdateFinalPriceItem(returnUpdateItemDto);
-                    CalculateSummary();
+                    //CalculateSummary();
+                    CartChanged();
+                    await Js.InvokeVoidAsync("SetBtnUpdateTotalVisible", id, false);
                     break;
                 default:
                     var item = CartBuyItems.FirstOrDefault(i => i.Id == id);
@@ -167,6 +169,14 @@ else
     protected async Task UpdateTotalCartItem_Input(int id)
     {
         await Js.InvokeVoidAsync("SetBtnUpdateTotalVisible", id, true);
+    }
+    #endregion
+
+    #region Cart Changed
+    private void CartChanged()
+    {
+        CalculateSummary();
+        CartBuyService.RaiseEventOnCartBuyChanged(Total); // notifying all subscribers
     }
     #endregion
 }
