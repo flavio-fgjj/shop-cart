@@ -1,4 +1,4 @@
-# ShoppingCart
+# Shopping Cart
 
 A Blazor Shopping Cart Demo
 
