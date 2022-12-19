@@ -45,11 +45,11 @@ else
                 }
             </div>
             <div class="col-md-3">
-                <h5>Cart - Summary</h5>
+                <h5>Carrinho - Resumo</h5>
                 <div class="mt-2">
                     <div>Total - (@Total items)&nbsp;<br /><b>@FinalPrice</b></div>
                     <a href="#" class="btn btn-success">
-                        <span class="oi oi-credit-card"></span>&nbsp; Close Order
+                        <span class="oi oi-credit-card"></span>&nbsp; Fechar Pedido
                     </a>
                 </div>
             </div>
@@ -58,7 +58,7 @@ else
     else
     {
         <div>
-            <h3><b>Your cart is empty</b></h3>
+            <h3><b>Seu carrinho de compras está vazio</b></h3>
        </div>
     }
 }
@@ -75,12 +75,17 @@ else
     protected string? FinalPrice { get; set; }
     protected int Total { get; set; }
 
+    [Inject]
+    public IManagerCartItemsLocalStorageService? managerCartItemsLocalStorageService { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            CartBuyItems = await CartBuyService.GetItems(LoggedUser.UserId);
+            //CartBuyItems = await CartBuyService.GetItems(LoggedUser.UserId);
             //CalculateSummary();
+
+            CartBuyItems = await managerCartItemsLocalStorageService.GetCollection();
             CartChanged();
         }
         catch (Exception ex)
@@ -140,6 +145,7 @@ else
     private async Task RemoveCartItem(int id)
     {
         CartBuyItems.Remove(GetCartItem(id));
+        await managerCartItemsLocalStorageService.SaveCollection(CartBuyItems);
     }
 
     #region Total Cart and Final Price
@@ -159,11 +165,13 @@ else
         SetTotal();
     }
 
-    private void UpdateFinalPriceItem(CartItemDto cartItemDto)
+    private async Task UpdateFinalPriceItem(CartItemDto cartItemDto)
     {
         var item = GetCartItem(cartItemDto.Id);
         if (item != null)
             item.FinalPrice = cartItemDto.Price * cartItemDto.Total;
+
+        await managerCartItemsLocalStorageService.SaveCollection(CartBuyItems);
     }
 
     protected async Task UpdateTotalCartItem_Input(int id)

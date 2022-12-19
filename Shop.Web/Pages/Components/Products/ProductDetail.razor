@@ -10,7 +10,7 @@ else if (ErrorMessage is not null)
 }
 else
 {
-    <h3 class="mb-5">Product Details</h3>
+    <h3 class="mb-5">Detalhes do Produto</h3>
     <div class="row">
         <div class="col-md-6 mb-4">
             <figure class="figure">
@@ -47,11 +47,8 @@ else
     [Inject]
     public ICartBuyService? CartBuyService { get; set; }
 
-
     [Inject]
     public NavigationManager? NavigationManager { get; set; }
-
-    private List<CartItemDto>? CartBuyItems { get; set; }
 
     [Parameter]
     public int Id { get; set; }
@@ -60,11 +57,21 @@ else
 
     public string? ErrorMessage { get; set; }
 
+    [Inject]
+    public IManagerCartItemsLocalStorageService? managerCartItemsLocalStorageService { get; set; }
+
+    private List<CartItemDto>? CartBuyItems { get; set; }
+
+    [Inject]
+    public IManagerProductsLocalStorageService? managerProductsLocalStorageService { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Product = await ProductService.GetItem(Id);
+            //Product = await ProductService.GetItem(Id);
+            CartBuyItems = await managerCartItemsLocalStorageService.GetCollection();
+            Product = await GetProductById(Id);
         }
         catch (Exception ex)
         {
@@ -78,11 +85,11 @@ else
         {
             var cartItemDto = await CartBuyService.AddItem(cartItemAddNewItemDto);
 
-            //if (cartItemDto != null)
-            //{
-            //    CartBuyItems.Add(cartItemDto);
-            //    await GerenciaCarrinhoItensLocalStorageService.SaveCollection(CarrinhoCompraItens);
-            //}
+            if (cartItemDto != null)
+            {
+                CartBuyItems.Add(cartItemDto);
+                await managerCartItemsLocalStorageService.SaveCollection(CartBuyItems);
+            }
 
             NavigationManager?.NavigateTo("/CartBuy");
         }
@@ -91,5 +98,13 @@ else
             ErrorMessage = ex.Message;
             throw;
         }
+    }
+
+    private async Task<ProductDto> GetProductById(int id)
+    {
+        var productsDto = await managerProductsLocalStorageService.GetCollection();
+        return productsDto != null
+            ? productsDto.SingleOrDefault(p => p.Id == id)
+            : null;
     }
 }

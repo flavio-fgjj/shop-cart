@@ -10,7 +10,7 @@ else if (ErrorMessage != null)
 }
 else
 {
-    <h3>Products (@NameCategory)</h3>
+    <h3>Produtos (@NameCategory)</h3>
 
     @if (ProductsDto.Count() > 0)
     {
@@ -30,12 +30,11 @@ else
 
     public IEnumerable<ProductDto>? ProductsDto { get; set; }
 
-    //[Inject]
-    //public IGerenciaProdutosLocalStorageService?
-    //            GerenciaProdutosLocalStorageService { get; set; }
-
     public string? NameCategory { get; set; }
     public string? ErrorMessage { get; set; }
+
+    [Inject]
+    public IManagerProductsLocalStorageService? managerProductsLocalStorageService { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -54,14 +53,12 @@ else
         }
     }
 
-    //private async Task<IEnumerable<ProductDto>> GetColectionProductsByCategoryId(int categoryId)
-    //{
-    //    var productCollection = await ManagerProductsLocalStorageService.GetCollection();
+    private async Task<IEnumerable<ProductDto>> GetColectionProductsByCategoryId(int categoryId)
+    {
+        var productCollection = await managerProductsLocalStorageService.GetCollection();
 
-    //    return productCollection != null 
-    //        ? productCollection.Where(p => p.CategoryId == categoryId)
-    //        : await ProductService.GetItemsByCategory(categoryId);
-    //}
-
-
+        return productCollection != null 
+            ? productCollection.Where(p => p.CategoryId == categoryId)
+            : await productService.GetItemsByCategory(categoryId);
+    }
 }

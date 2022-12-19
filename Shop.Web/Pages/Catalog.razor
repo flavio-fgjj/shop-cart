@@ -2,13 +2,17 @@
 @inject IProductService productService
 @using Shop.Web.Pages.Components.Products
 
-@if (Products == null)
+@if (Products is null && ErrorMessage is null)
 {
-	<h3>Loading...</h3>
+    <ShowSpinner />
+}
+else if (ErrorMessage is not null)
+{
+    <ShowError ErrorMessage="@ErrorMessage"></ShowError>
 }
 else
 {
-	<h3 class="mb-5">Products</h3>
+	<h3 class="mb-5">Produtos</h3>
 	@if (Products.Count() > 0)
 	{
 		var productsByCategory = from product in Products
@@ -31,17 +35,45 @@ else
 @code {
 	public IEnumerable<ProductDto>? Products { get; set; }
 
+
 	[Inject]
 	public ICartBuyService? CartBuyService { get; set; }
 
+	[Inject]
+	public IManagerCartItemsLocalStorageService? managerCartItemsLocalStorageService { get; set; }
+
+	[Inject]
+	public IManagerProductsLocalStorageService? managerProductsLocalStorageService { get; set; }
+
+	public string? ErrorMessage { get; set; }
+
 	protected override async Task OnInitializedAsync()
 	{
-		Products = await productService.GetItems();
 
-		// send notifications for all subscribers from CartBuyChanged event
-		var cartBuyItems = await CartBuyService.GetItems(LoggedUser.UserId);
-		CartBuyService.RaiseEventOnCartBuyChanged(cartBuyItems.Sum(x => x.Total));
+		try
+		{
+			await ClearLocalStorage();
+
+			Products = await productService.GetItems();
+
+			// send notifications for all subscribers from CartBuyChanged event
+			//var cartBuyItems = await CartBuyService.GetItems(LoggedUser.UserId);
+			var cartBuyItems = await managerCartItemsLocalStorageService.GetCollection();
+
+			CartBuyService.RaiseEventOnCartBuyChanged(cartBuyItems.Sum(x => x.Total));
+		}
+		catch (Exception ex)
+		{
+			// Don't show sensive information when you are out of develop env
+			ErrorMessage = ex.Message;
+		}
+
+		
 	}
 
-
+	private async Task ClearLocalStorage()
+	{
+		await managerCartItemsLocalStorageService.RemoveCollection();
+		await managerProductsLocalStorageService.RemoveCollection();
+	}
 }
