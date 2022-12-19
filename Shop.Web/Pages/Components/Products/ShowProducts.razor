@@ -1,11 +1,12 @@
 ﻿@foreach (var item in Products)
 {
 	<div class="col-md-3 mb-2">
-		<a href="/product-detail/@item.Id">
+		<a href="/ProductDetail/@item.Id">
 			<div class="card">
 				<img class="img-thumbnail" src="@item.ImageUrl"/>
 				<div class="card-body">
-					<h5 class="card-subtitle mb-3">@item.Price?.ToString("c")</h5>
+					<p class="mb-4">@item.Description</p>
+					<h5 class="card-title mb-3">@item.Price?.ToString("c")</h5>
 				</div>
 			</div>
 		</a>

@@ -9,9 +9,15 @@ public class ProductRepository : IProductRepository
     // This class will access the database 
 
     private readonly AppDbContext _context; // dependency injection
+    
     public ProductRepository(AppDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<IEnumerable<Category>> GetCategories()
+    {
+        return await _context.Categories.ToListAsync();
     }
 
     public async Task<Product> GetItem(int id)

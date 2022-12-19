@@ -56,4 +56,53 @@ public class ProductService : IProductService
             throw;
         }
     }
+
+    public async Task<IEnumerable<CategoryDto>> GetCategories()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync("api/Products/GetCategories");
+            if (response.IsSuccessStatusCode)
+            {
+                return response.StatusCode == System.Net.HttpStatusCode.NoContent
+                    ? Enumerable.Empty<CategoryDto>()
+                    : await response.Content.ReadFromJsonAsync<IEnumerable<CategoryDto>>();
+            }
+            else
+            {
+                var message = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Http Status Code - {response.StatusCode} Message - {message}");
+            }
+        }
+        catch (Exception)
+        {
+            _logger.LogError($"Error to get categories");
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<ProductDto>> GetItemsByCategory(int categoryId)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"api/Products/{categoryId}/GetItemsByCategory");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return response.StatusCode == System.Net.HttpStatusCode.NoContent
+                    ? Enumerable.Empty<ProductDto>()
+                    : await response.Content.ReadFromJsonAsync<IEnumerable<ProductDto>>();
+            }
+            else
+            {
+                var message = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Http Status Code - {response.StatusCode} Message - {message}");
+            }
+        }
+        catch (Exception)
+        {
+            _logger.LogError($"Error to get itemm by category");
+            throw;
+        }
+    }
 }

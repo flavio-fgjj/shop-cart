@@ -1,4 +1,4 @@
-﻿@page "/product-detail/{Id:int}"
+﻿@page "/ProductDetail/{Id:int}"
 
 @if (Product is null && ErrorMessage is null)
 {
@@ -84,7 +84,7 @@ else
             //    await GerenciaCarrinhoItensLocalStorageService.SaveCollection(CarrinhoCompraItens);
             //}
 
-            NavigationManager.NavigateTo("/CartBuy");
+            NavigationManager?.NavigateTo("/CartBuy");
         }
         catch (Exception ex)
         {

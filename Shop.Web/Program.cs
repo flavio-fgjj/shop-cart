@@ -17,4 +17,5 @@ builder.Services.AddScoped(sp => new HttpClient
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartBuyService, CartBuyService>();
 
+
 await builder.Build().RunAsync();

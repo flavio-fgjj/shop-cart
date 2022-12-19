@@ -26,8 +26,8 @@ public class CartBuyController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{userId}/GetItens")]
-    public async Task<ActionResult<IEnumerable<CartItemDto>>> GetItens(string userId)
+    [Route("{userId}/GetItems")]
+    public async Task<ActionResult<IEnumerable<CartItemDto>>> GetItems(string userId)
     {
         try
         {

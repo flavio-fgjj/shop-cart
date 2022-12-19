@@ -37,7 +37,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(policy =>
-    policy.WithOrigins("https://localhost:7000", "https://localhost:5000")
+    policy.WithOrigins("https://localhost:7000", "https://localhost:7000")
     .AllowAnyMethod()
     .AllowAnyHeader()
     .WithHeaders(HeaderNames.ContentType)

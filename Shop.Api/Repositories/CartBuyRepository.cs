@@ -43,12 +43,12 @@ namespace Shop.Api.Repositories
                     return resultado.Entity;
                 }
             }
-            return new CartItem();
+            return null;
         }
 
         public async Task<CartItem> GetItem(int id)
         {
-            var ret = await (from cart in _context.Carts
+            return await (from cart in _context.Carts
                              join cartItem in _context.CartItems
                              on cart.Id equals cartItem.CartId
                              where cartItem.Id == id
@@ -59,12 +59,11 @@ namespace Shop.Api.Repositories
                                  Total = cartItem.Total,
                                  CartId = cartItem.CartId
                              }).SingleOrDefaultAsync();
-            return ret ?? new CartItem();
         }
 
         public async Task<IEnumerable<CartItem>> GetItems(string userId)
         {
-            return await (from cart in _context.Carts
+            var ret = await (from cart in _context.Carts
                           join cartItem in _context.CartItems
                           on cart.Id equals cartItem.CartId
                           where cart.UserId == userId
@@ -75,6 +74,8 @@ namespace Shop.Api.Repositories
                               Total = cartItem.Total,
                               CartId = cartItem.CartId
                           }).ToListAsync();
+
+            return ret;
         }
 
         public async Task<CartItem> RemoveItem(int id)

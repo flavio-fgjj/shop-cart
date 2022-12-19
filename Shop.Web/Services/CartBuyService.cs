@@ -45,8 +45,7 @@ public class CartBuyService : ICartBuyService
     {
         try
         {
-            //envia um request GET para a uri da API CarrinhoCompra
-            var response = await _httpClient.GetAsync($"api/CartBuy/{userId}/GetItens");
+            var response = await _httpClient.GetAsync($"api/CartBuy/{userId}/GetItems");
 
             if (response.IsSuccessStatusCode)
             {

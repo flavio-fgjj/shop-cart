@@ -78,5 +78,20 @@ namespace Shop.Api.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GetCategories")]
+        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
+        {
+            try
+            {
+                var categories = await _productRepository.GetCategories();
+                var categoriesDto = categories.MapCategoriesToDto();
+                return Ok(categoriesDto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error access database");
+            }
+        }
     }
 }
