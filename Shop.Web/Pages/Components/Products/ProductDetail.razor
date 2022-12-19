@@ -22,7 +22,7 @@ else
             <h3>@Product.Name</h3>
             <p class="mb-4">
                 <b>
-                    @Product.Price?.ToString("C")&nbsp;(@Product.Total in stock)
+                    @Product.Price?.ToString("c")&nbsp;(@Product.Total em estoque)
                 </b>
             </p>
             <div>
@@ -32,7 +32,7 @@ else
                          ProductId = Product.Id,
                          Total = 1
                   })">
-                    Add to cart <span class="oi oi-basket"></span>
+                    Adicionar ao Carrinho <span class="oi oi-basket"></span>
                 </button>
             </div>
 

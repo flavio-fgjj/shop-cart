@@ -25,4 +25,6 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<IManagerProductsLocalStorageService, ManagerProductsLocalStorageService>();
 builder.Services.AddScoped<IManagerCartItemsLocalStorageService, ManagerCartItemsLocalStorageService>();
 
+builder.Services.AddLocalization();
+
 await builder.Build().RunAsync();
